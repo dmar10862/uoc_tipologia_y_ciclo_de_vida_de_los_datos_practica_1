@@ -8,36 +8,30 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import matplotlib.pyplot as plt
-from datetime import date
+from datetime import datetime
+import seaborn as sns
+import numpy as np
 
 
 # In[2]:
 
 
+url = 'https://www.worldometers.info/coronavirus/'
+now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 _dict = {}
+save_csv = True
+append_csv = True
+percentile = 97
 
 
 # In[3]:
-
-
-url = 'https://www.worldometers.info/coronavirus/'
-today = str(date.today())
-
-
-# In[4]:
 
 
 page = requests.get(url)
 soup = BeautifulSoup(page.content)
 
 
-# In[5]:
-
-
-print(soup.prettify())
-
-
-# In[6]:
+# In[4]:
 
 
 for _tr_list in soup.tbody.find_all('tr'):
@@ -61,40 +55,122 @@ for _tr_list in soup.tbody.find_all('tr'):
                 country_name = country_name.strip()
                 if country_name not in list(_dict.keys()):
                     _dict[country_name] = {} 
-                _dict[country_name][today] = []
+                _dict[country_name][now] = []
         # Recuperar los datos del pais
         else:
             if len(_td.contents) > 0:
+                # Limipiar el dato de cualquier símbolo para poder convertirlo en un valor numérico
                 data = _td.contents[0].replace('+','').replace(',','').strip()
                 if data:
-                    _dict[country_name][today].append(float(data))
+                    _dict[country_name][now].append(float(data))
                 else:
-                    _dict[country_name][today].append(0)
+                    _dict[country_name][now].append(0)
             else:
-                _dict[country_name][today].append(0)
+                _dict[country_name][now].append(0)
+
+
+# In[5]:
 
 
 # https://stackoverflow.com/questions/13575090/construct-pandas-dataframe-from-items-in-nested-dictionary
+df = pd.concat({k: pd.DataFrame(v).T for k, v in _dict.items()}, axis=0)
+df.columns = ['total_cases', 'new_cases', 'total_deaths', 'new_deaths', 'total_recovered', 'active_cases', 'servious_critical', 'total_cases_1M_pop']
+df.index.names = ['country', 'timestamp']
+display(df.head())
+
+
+# In[6]:
+
+
+if save_csv:
+    if append_csv:
+        print('Adding data to csv...')
+        df.to_csv('covid-19_2020.csv', mode='a', header=False, index=True) 
+    else:
+        print('Creating csv...')
+        df.to_csv('covid-19_2020.csv', index=True)    
+else:
+    print('Save csv not needed')
+
 
 # In[7]:
 
 
-df = pd.concat({k: pd.DataFrame(v).T for k, v in _dict.items()}, axis=0)
-df.columns = ['total_cases', 'new_cases', 'total_deaths', 'new_deaths', 'total_recovered', 'active_cases', 'servious_critical', 'total_cases_1M_pop']
-display(df.head())
+df = pd.read_csv('covid-19_2020.csv')
 
 
 # In[8]:
 
 
-df.loc['spain'].loc['2020-03-18']['total_cases']
+df.head()
 
 
 # In[9]:
 
 
-df.to_csv('out.csv', index=True) 
+# Solo paises más significativos
+df_significant = df[(df['total_cases'] > np.percentile(df['total_cases'], percentile))].sort_values(by = ['total_cases'], ascending=False)
+
+# Se muestra el número de casos según el país ("country") para la última muestra
+last_timestamp = list(df_significant['timestamp'])[0]
+df_last_timestamp = df_significant[(df_significant['timestamp'] == last_timestamp)]
+display(df_last_timestamp)
 
 
+# In[10]:
 
-# %%
+
+# Se representan gráficamente los resultados
+# https://seaborn.pydata.org/generated/seaborn.barplot.html#seaborn.barplot
+plot = sns.barplot(x="country", y="total_cases", data=df_last_timestamp)
+
+
+# In[11]:
+
+
+plot = sns.barplot(x="country", y="total_deaths", data=df_last_timestamp)
+
+
+# In[12]:
+
+
+# Añadir dia (date)
+df_significant['date'] = [timestamp.split()[0] for timestamp in df_significant['timestamp']]
+
+# Agrupar por dia (date) utilizando el valor máximo del día
+df_by_date = df_significant.groupby(['country','date']).max().round()
+display(df_by_date.head())
+
+
+# In[13]:
+
+
+# Se muestra la evolución en el tiempo para cada país ("country")
+# Se representan gráficamente los resultados
+# 
+plot = sns.barplot(x="country", y="total_cases", hue = "date", data=df_by_date.reset_index())
+
+
+# In[14]:
+
+
+plot = sns.barplot(x="country", y="total_deaths", hue = "date", data=df_by_date.reset_index())
+
+
+# In[15]:
+
+
+df_spain = df_by_date.loc['spain']
+
+
+# In[16]:
+
+
+plot = sns.barplot(x='date', y="total_cases", data=df_spain.reset_index())
+
+
+# In[17]:
+
+
+plot = sns.barplot(x='date', y="total_deaths", data=df_spain.reset_index())
+
