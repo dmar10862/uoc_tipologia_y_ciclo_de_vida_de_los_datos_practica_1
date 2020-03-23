@@ -76,7 +76,6 @@ for _tr_list in soup.tbody.find_all('tr'):
 df = pd.concat({k: pd.DataFrame(v).T for k, v in _dict.items()}, axis=0)
 df.columns = ['total_cases', 'new_cases', 'total_deaths', 'new_deaths', 'total_recovered', 'active_cases', 'servious_critical', 'total_cases_1M_pop']
 df.index.names = ['country', 'timestamp']
-display(df.head())
 
 
 # In[6]:
@@ -91,86 +90,3 @@ if save_csv:
         df.to_csv('covid-19_2020.csv', index=True)    
 else:
     print('Save csv not needed')
-
-
-# In[7]:
-
-
-df = pd.read_csv('covid-19_2020.csv')
-
-
-# In[8]:
-
-
-df.head()
-
-
-# In[9]:
-
-
-# Solo paises más significativos
-df_significant = df[(df['total_cases'] > np.percentile(df['total_cases'], percentile))].sort_values(by = ['total_cases'], ascending=False)
-
-# Se muestra el número de casos según el país ("country") para la última muestra
-last_timestamp = list(df_significant['timestamp'])[0]
-df_last_timestamp = df_significant[(df_significant['timestamp'] == last_timestamp)]
-display(df_last_timestamp)
-
-
-# In[10]:
-
-
-# Se representan gráficamente los resultados
-# https://seaborn.pydata.org/generated/seaborn.barplot.html#seaborn.barplot
-plot = sns.barplot(x="country", y="total_cases", data=df_last_timestamp)
-
-
-# In[11]:
-
-
-plot = sns.barplot(x="country", y="total_deaths", data=df_last_timestamp)
-
-
-# In[12]:
-
-
-# Añadir dia (date)
-df_significant['date'] = [timestamp.split()[0] for timestamp in df_significant['timestamp']]
-
-# Agrupar por dia (date) utilizando el valor máximo del día
-df_by_date = df_significant.groupby(['country','date']).max().round()
-display(df_by_date.head())
-
-
-# In[13]:
-
-
-# Se muestra la evolución en el tiempo para cada país ("country")
-# Se representan gráficamente los resultados
-# 
-plot = sns.barplot(x="country", y="total_cases", hue = "date", data=df_by_date.reset_index())
-
-
-# In[14]:
-
-
-plot = sns.barplot(x="country", y="total_deaths", hue = "date", data=df_by_date.reset_index())
-
-
-# In[15]:
-
-
-df_spain = df_by_date.loc['spain']
-
-
-# In[16]:
-
-
-plot = sns.barplot(x='date', y="total_cases", data=df_spain.reset_index())
-
-
-# In[17]:
-
-
-plot = sns.barplot(x='date', y="total_deaths", data=df_spain.reset_index())
-
