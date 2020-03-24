@@ -1,3 +1,19 @@
 {
     "python.pythonPath": "C:\\Users\\dmarinsa\\AppData\\Local\\Continuum\\anaconda3\\python.exe"
 }
+
+{
+    "ego.power-tools": {
+        "jobs": [
+            {
+                "name": "ETL",
+                "description": "Load COVID-19 Data",
+                "time": "*/5 * * * * *",
+                "action": {
+                    "type": "script",
+                    "script": "src/scraper.py"
+                }
+            }
+        ]
+    }
+}
