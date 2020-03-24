@@ -17,10 +17,10 @@ import numpy as np
 
 
 url = 'https://www.worldometers.info/coronavirus/'
-now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+now = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
 _dict = {}
 save_csv = True
-append_csv = True
+append_csv = False
 percentile = 97
 
 
@@ -36,9 +36,9 @@ soup = BeautifulSoup(page.content)
 
 for _tr_list in soup.tbody.find_all('tr'):
     _td_list = _tr_list.find_all('td')
-    for i, _td in enumerate(_td_list):        
+    for i, _td in enumerate(_td_list):  
         # Recuperar el nombre del pais cuando es un enlace
-        if i%9 == 0:
+        if i%10 == 0:
             _a = _td.find('a')
                 # Recuperar el nombre del pais cuando es un enlace
             if _a:
@@ -74,8 +74,9 @@ for _tr_list in soup.tbody.find_all('tr'):
 
 # https://stackoverflow.com/questions/13575090/construct-pandas-dataframe-from-items-in-nested-dictionary
 df = pd.concat({k: pd.DataFrame(v).T for k, v in _dict.items()}, axis=0)
-df.columns = ['total_cases', 'new_cases', 'total_deaths', 'new_deaths', 'total_recovered', 'active_cases', 'servious_critical', 'total_cases_1M_pop']
+df.columns = ['total_cases', 'new_cases', 'total_deaths', 'new_deaths', 'total_recovered', 'active_cases', 'servious_critical', 'total_cases_1M_pop', 'total_deaths_1M_pop']
 df.index.names = ['country', 'timestamp']
+display(df.head())
 
 
 # In[6]:
@@ -90,3 +91,94 @@ if save_csv:
         df.to_csv('covid-19_2020.csv', index=True)    
 else:
     print('Save csv not needed')
+
+
+# In[7]:
+
+
+df = pd.read_csv('covid-19_2020.csv')
+
+
+# In[8]:
+
+
+df.head()
+
+
+# In[9]:
+
+
+# Solo paises más significativos
+df_significant = df[(df['total_cases'] > np.percentile(df['total_cases'], percentile))].sort_values(by = ['total_cases'], ascending=False)
+
+# Se muestra el número de casos según el país ("country") para la última muestra
+last_timestamp = list(df_significant['timestamp'])[0]
+df_last_timestamp = df_significant[(df_significant['timestamp'] == last_timestamp)]
+display(df_last_timestamp)
+
+
+# In[11]:
+
+
+# Se representan gráficamente los resultados
+# https://seaborn.pydata.org/generated/seaborn.barplot.html#seaborn.barplot
+plot = sns.barplot(x="country", y="total_cases", data=df_last_timestamp)
+
+
+# In[12]:
+
+
+plot = sns.barplot(x="country", y="total_deaths", data=df_last_timestamp)
+
+
+# In[13]:
+
+
+# Añadir dia (date)
+df_significant['date'] = [timestamp.split()[0] for timestamp in df_significant['timestamp']]
+
+# Agrupar por dia (date) utilizando el valor máximo del día
+df_by_date = df_significant.groupby(['country','date']).max().round()
+df_by_date = df_by_date.sort_values(by = ['date', 'total_cases'], ascending=False)
+
+display(df_by_date.head())
+
+
+# In[14]:
+
+
+# Se muestra la evolución en el tiempo para cada país ("country")
+# Se representan gráficamente los resultados
+# 
+plot = sns.barplot(x="country", y="total_cases", hue = "date", data=df_by_date.reset_index())
+
+
+# In[15]:
+
+
+plot = sns.barplot(x="country", y="total_deaths", hue = "date", data=df_by_date.reset_index())
+
+
+# In[16]:
+
+
+df_spain = df_by_date.loc['spain']
+
+
+# In[17]:
+
+
+plot = sns.barplot(x='date', y="total_cases", data=df_spain.reset_index())
+
+
+# In[18]:
+
+
+plot = sns.barplot(x='date', y="total_deaths", data=df_spain.reset_index())
+
+
+# In[ ]:
+
+
+
+
