@@ -10,4 +10,4 @@ La actividad ha sido realizada de manera individual por **David Marín Sánchez*
 
 ## Ficheros del código fuente
 
-* **src/scraper.ipynb**: Notebook donde se realiza _web scrapping_ sobre la web [worldometers](https://www.worldometers.info/coronavirus/), se genera el dataset y se muestra un primer análisis exploratorio.
+* **src/scraper.ipynb**: Notebook donde se realiza _web scrapping_ sobre la web [worldometers](https://www.worldometers.info/coronavirus/), se genera un _dataset_ con los datos obtenidos y se muestra un primer análisis exploratorio.
