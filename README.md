@@ -10,6 +10,4 @@ La actividad ha sido realizada de manera individual por **David Marín Sánchez*
 
 ## Ficheros del código fuente
 
-* **src/scraper.py**: Script que implmenta las funciones para realizar _web scrapping_ sobre la web [worldometers](https://www.worldometers.info/coronavirus/).
-
-## Recursos
+* **src/scraper.ipynb**: Notebook donde se realiza _web scrapping_ sobre la web [worldometers](https://www.worldometers.info/coronavirus/), se genera el dataset y se muestra un primer análisis exploratorio.
