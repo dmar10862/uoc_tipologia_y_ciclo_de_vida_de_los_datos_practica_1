@@ -10,8 +10,8 @@ La actividad ha sido realizada de manera individual por **David Marín Sánchez*
 
 ## Ficheros
 
-* **src/scraper.ipynb**: Notebook donde se implementan las técnicas de _web scrapping_ sobre la web [worldometers](https://www.worldometers.info/coronavirus/), se genera un _dataset_ con los datos obtenidos y se muestran en un primer análisis exploratorio.
+* **src/covid-19_world_scraper**: Notebook donde se implementan las técnicas de _web scrapping_ sobre la web [worldometers](https://www.worldometers.info/coronavirus/), se genera un _dataset_ con los datos obtenidos y se muestran en un primer análisis exploratorio.
 
-* **src/covid-19_2020.csv**: Fichero csv que contiene el _dataset_.
+* **src/covid-19_world_2020**: Fichero csv que contiene el _dataset_.
 
 * **M2851-PRAC1.pdf**: Fichero pdf que contien las respuestas de la práctica.
