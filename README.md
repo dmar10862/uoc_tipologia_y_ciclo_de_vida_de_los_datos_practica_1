@@ -8,8 +8,11 @@ Esta práctica se ha realizado bajo el contexto de la asignatura Tipología y ci
 
 La actividad ha sido realizada de manera individual por **David Marín Sánchez**.
 
-## Ficheros del código fuente
+## Ficheros
 
-* **src/scraper.py**: Script que implmenta las funciones para realizar _web scrapping_ sobre la web [worldometers](https://www.worldometers.info/coronavirus/).
+* **src/covid-19_world_scraper**: Notebook donde se implementan las técnicas de _web scrapping_ sobre la web [worldometers](https://www.worldometers.info/coronavirus/), se genera un _dataset_ con los datos obtenidos y se muestran en un primer análisis exploratorio.
 
-## Recursos
+* **src/covid-19_world_2020**: Fichero CSV que contiene el _dataset_. Publicado en [zenodo](https://zenodo.org/) como:
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3747319.svg)](https://doi.org/10.5281/zenodo.3747319)
+
+* **M2851-PRAC1.pdf**: Fichero pdf que contien las respuestas de la práctica.
